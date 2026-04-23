@@ -31,7 +31,6 @@ pipeline {
         stage('Testing the app') {
             steps {
                 echo 'Testing..'
-                sh 'pip install unittest'
 //                sh 'python3 tests/*.py'
                 sh 'python3 -m unittest discover tests'
             }
