@@ -17,13 +17,7 @@ pipeline {
                 sh 'which python3'  // See which Python binary Jenkins is using
             }
         }
-        stage('Testing the app') {
-            steps {
-                echo 'Testing..'
-                sh 'pip3 install -r requirements.txt'
-                sh 'python3 tests/*.py'
-            }
-        }
+
         stage('Deploy') {
             steps {
                 sh '/usr/local/bin/docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
@@ -32,6 +26,13 @@ pipeline {
                 sh "/usr/local/bin/docker rm my-shop-container || true"
                 sh '/usr/local/bin/docker run -d --name online-shop -p 5000:8080 wasiqmajeed/my-shop:${BUILD_NUMBER}'
                 sh '/usr/local/bin/docker ps -a'
+            }
+        }
+        stage('Testing the app') {
+            steps {
+                echo 'Testing..'
+                sh 'pip3 install -r requirements.txt'
+                sh 'python3 tests/*.py'
             }
         }
     }
