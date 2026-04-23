@@ -10,7 +10,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                python3 tests/addtocart.py
+                sh 'python3 tests/addtocart.py'
             }
         }
         stage('Deploy') {
