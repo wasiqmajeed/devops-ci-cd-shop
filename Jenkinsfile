@@ -24,7 +24,7 @@ pipeline {
                 echo "${BUILD_NUMBER}"
                 sh "/usr/local/bin/docker stop online-shop || true"
                 sh "/usr/local/bin/docker rm online-shop || true"
-                sh '/usr/local/bin/docker run -d --name online-shop -p 5000:8080 wasiqmajeed/my-shop:${BUILD_NUMBER}'
+                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
                 sh '/usr/local/bin/docker ps -a'
             }
         }
