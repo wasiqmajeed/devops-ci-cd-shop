@@ -26,12 +26,12 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
+                sh '/usr/local/bin/docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
                 echo "${BUILD_NUMBER}"
-                sh "docker stop my-shop-container || true"
-                sh "docker rm my-shop-container || true"
-                sh 'docker run -d --name online-shop -p 5000:8080 wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh 'docker ps -a'
+                sh "/usr/local/bin/docker stop my-shop-container || true"
+                sh "/usr/local/bin/docker rm my-shop-container || true"
+                sh '/usr/local/bin/docker run -d --name online-shop -p 5000:8080 wasiqmajeed/my-shop:${BUILD_NUMBER}'
+                sh '/usr/local/bin/docker ps -a'
             }
         }
     }
