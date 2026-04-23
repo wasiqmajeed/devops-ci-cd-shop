@@ -32,7 +32,11 @@ pipeline {
             steps {
                 echo 'Testing..'
 //                sh 'python3 tests/*.py'
-                sh 'python3 -m unittest discover tests'
+                sh '''
+                for test in tests/*.py; do
+                    python3 "$test" || exit 1
+                done
+                '''
             }
         }
     }
