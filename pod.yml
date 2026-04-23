@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wasiqpod
+spec:
+  containers:
+  - name: wasiq-shop
+    image: wasiqmajeed/my-shop:v2
+    ports:
+    - containerPort: 5000
+

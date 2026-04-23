@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasiq-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wasiqshop
+  template:
+    metadata:
+      labels:
+        app: wasiqshop
+    spec:
+      containers:
+      - name: wasiqshop
+        image: wasiqmajeed/my-shop:v2
+        ports:
+        - containerPort: 80
+
