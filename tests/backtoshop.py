@@ -12,7 +12,7 @@ def test_local_site():
     try:
         # Navigate to your locally hosted site
         print("Navigating to http://127.0.0.1:5000/...")
-        driver.get("http://127.0.0.1:5000/")
+        driver.get("http://127.0.0.1:8081/")
 
         # Print the page title to verify connection
         print(f"Page Title: {driver.title}")
