@@ -73,6 +73,8 @@ def test_local_site():
         back_to_homepage.click()
         time.sleep(2)
 
+        driver.execute_script('sauce:job-result=passed')  # Set the test status to pass
+
     except Exception as e:
         print(f"An error occurred: {e}")
 
