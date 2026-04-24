@@ -32,11 +32,16 @@ pipeline {
             steps {
                 echo 'Testing..'
 //                sh 'python3 tests/*.py'
+                withCredentials([usernamePassword(credentialsId: 'sauce-labs-creds',
+                                                passwordVariable: 'SAUCE_ACCESS_KEY',
+                                                usernameVariable: 'SAUCE_USERNAME')])
+                {
                 sh '''
                 for test in tests/*.py; do
                     python3 "$test" || exit 1
                 done
                 '''
+                }
             }
         }
     }
