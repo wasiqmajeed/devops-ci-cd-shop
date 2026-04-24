@@ -58,7 +58,7 @@ def test_local_site():
         )
         # Navigate to your locally hosted site
         print("Add more items test")
-        driver.get("http://localhost:8081/")
+        driver.get("http://download.oracle.com:8081/")
 
         # Print the page title to verify connection
         print(f"Page Title: {driver.title}")
@@ -69,6 +69,7 @@ def test_local_site():
         view_item.click()
 
         time.sleep(3)
+        driver.execute_script('sauce:job-result=passed')  # Set the test status to pass
 
 
     except Exception as e:
