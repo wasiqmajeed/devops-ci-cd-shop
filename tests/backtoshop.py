@@ -11,8 +11,8 @@ import os
 
 def test_local_site():
     # Setup the Chrome driver automatically
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    # service = Service(ChromeDriverManager().install())
+    # driver = webdriver.Chrome(service=service)
 
     try:
         SAUCE_USERNAME = os.environ.get('SAUCE_USERNAME')
@@ -58,7 +58,7 @@ def test_local_site():
         )
         # Navigate to your locally hosted site
         print("Back to Shop test")
-        driver.get("http://127.0.0.1:8081/")
+        driver.get("http://download.oracle.com:8081/")
 
         # Print the page title to verify connection
         print(f"Page Title: {driver.title}")
