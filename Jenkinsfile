@@ -48,7 +48,8 @@ pipeline {
         stage('Push the image to Docker registry'){
             steps {
                 echo 'Pushing the image to Docker registry'
-                sh 'docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
+//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
+                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:28'
 
 
             }
