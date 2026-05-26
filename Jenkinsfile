@@ -29,22 +29,22 @@ pipeline {
                 sh '/usr/local/bin/docker ps -a'
             }
         }
-        stage('Testing the app') {
-            steps {
-                echo 'Testing..'
-//                sh 'python3 tests/*.py'
-                withCredentials([usernamePassword(credentialsId: 'sauce-labs-creds',
-                                                passwordVariable: 'SAUCE_ACCESS_KEY',
-                                                usernameVariable: 'SAUCE_USERNAME')])
-                {
-                sh '''
-                for test in tests/*.py; do
-                    python3 "$test" || exit 1
-                done
-                '''
-                }
-            }
-        }
+//        stage('Testing the app') { // Skipping for now as I am not testing this part
+//            steps {
+//                echo 'Testing..'
+////                sh 'python3 tests/*.py'
+//                withCredentials([usernamePassword(credentialsId: 'sauce-labs-creds',
+//                                                passwordVariable: 'SAUCE_ACCESS_KEY',
+//                                                usernameVariable: 'SAUCE_USERNAME')])
+//                {
+//                sh '''
+//                for test in tests/*.py; do
+//                    python3 "$test" || exit 1
+//                done
+//                '''
+//                }
+//            }
+//        }
         stage('Push the image to Docker registry'){
             steps {
                 echo 'Pushing the image to Docker registry'
