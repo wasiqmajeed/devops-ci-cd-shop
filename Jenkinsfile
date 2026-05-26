@@ -58,7 +58,8 @@ pipeline {
                     }
                 echo 'Pushing the image to Docker registry'
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
+//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
+                echo 'Pushed the image to Docker registry'
                 }
             }
         }
