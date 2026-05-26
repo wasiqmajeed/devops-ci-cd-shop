@@ -47,6 +47,15 @@ pipeline {
 //        }
         stage('Push the image to Docker registry'){
             steps {
+                script {
+                    // 1. Securely log in using the shell
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
+                                                     passwordVariable: 'DOCKER_PASS',
+                                                     usernameVariable: 'DOCKER_USER')]) {
+
+                        // We use --password-stdin to avoid printing the password to logs
+                        sh "echo '$DOCKER_PASS' | /usr/local/bin/docker login -u '$DOCKER_USER' --password-stdin"
+                    }
                 echo 'Pushing the image to Docker registry'
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
                 sh '/usr/local/bin/docker push wasiqmajeed/my-shop:28'
