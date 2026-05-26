@@ -59,8 +59,7 @@ pipeline {
                 echo 'Pushing the image to Docker registry'
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
                 sh '/usr/local/bin/docker push wasiqmajeed/my-shop:28'
-
-
+                }
             }
         }
 // Deploy the new image on ECS using ECR
