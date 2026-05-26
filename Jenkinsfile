@@ -25,7 +25,7 @@ pipeline {
                 sh "/usr/local/bin/docker stop online-shop || true"
                 sh "/usr/local/bin/docker rm online-shop || true"
 //                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:28'
+                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:latest'
                 sh '/usr/local/bin/docker ps -a'
             }
         }
@@ -58,7 +58,7 @@ pipeline {
                     }
                 echo 'Pushing the image to Docker registry'
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:28'
+                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
                 }
             }
         }
