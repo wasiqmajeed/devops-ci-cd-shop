@@ -2,7 +2,16 @@ pipeline {
     agent any
 
     environment {
+        IMAGE_NAME     = "wasiqmajeed/my-shop"
         IMAGE_TAG = "${BUILD_NUMBER}"
+
+        // AWS Configs (Replace with your actual values)
+        AWS_ACCOUNT_ID = "343147895179"
+        AWS_REGION     = "eu-central-1"
+        ECR_REPO_NAME  = "my-shop"
+        ECS_CLUSTER    = "my-shop-cluster"
+        ECS_SERVICE    = "my-shop-web-service"
+        TASK_FAMILY    = "my-shop-task"
     }
 
     stages {
@@ -60,6 +69,24 @@ pipeline {
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
 //                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
                 echo 'Pushed the image to Docker registry'
+                }
+            }
+        }
+
+        stage('Push to AWS ECR') {
+            steps {
+                echo 'Logging into Amazon ECR and pushing...'
+                withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials' ]]) {
+                    // Authenticate Docker to AWS ECR
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr${AWS_REGION}.amazonaws.com"
+
+                    // Tag for ECR and push
+//                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+                    sh "docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
+                    sh "docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
+//                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
                 }
             }
         }
