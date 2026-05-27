@@ -29,12 +29,12 @@ pipeline {
 
         stage('Build the docker image') {
             steps {
-//                sh '/usr/local/bin/docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
+                sh '/usr/local/bin/docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
                 echo "${BUILD_NUMBER}"
                 sh "/usr/local/bin/docker stop online-shop || true"
                 sh "/usr/local/bin/docker rm online-shop || true"
-//                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:latest'
+                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
+//                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:latest'
                 sh '/usr/local/bin/docker ps -a'
             }
         }
@@ -66,8 +66,8 @@ pipeline {
                         sh "echo '$DOCKER_PASS' | /usr/local/bin/docker login -u '$DOCKER_USER' --password-stdin"
                     }
                 echo 'Pushing the image to Docker registry'
-//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
-//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
+                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
+                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
                 echo 'Pushed the image to Docker registry'
                 }
             }
@@ -81,11 +81,11 @@ pipeline {
                     sh "/usr/local/bin/aws ecr get-login-password --region ${AWS_REGION} | /usr/local/bin/docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
                     // Tag for ECR and push
-//                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
-                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
+                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+//                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
 //                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
-//                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
-                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
+                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+//                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
 //                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
                 }
             }
