@@ -101,26 +101,26 @@ pipeline {
                     // (Using a simple Python inline script to modify the JSON cleanly without breaking layout)
                     sh """
                     python3 -c "
-                    import json
-                    with open('task-def.json', 'r') as f:
-                        data = json.load(f)
-                        print("1.",data)
+import json
+with open('task-def.json', 'r') as f:
+    data = json.load(f)
+print("1.",data)
 
-                    # Strip out metadata AWS rejects on registration
-                    for key in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes', 'compatibilities', 'registeredAt', 'registeredBy']:
-                        data.pop(key, None)
+# Strip out metadata AWS rejects on registration
+for key in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes', 'compatibilities', 'registeredAt', 'registeredBy']:
+    data.pop(key, None)
 
-                    print("Data after poping",data)
+print("2.", data)
 
-                    # Update the image string
-                    data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}'
+# Update the image string
+data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}'
 
-                    with open('new-task-def.json', 'w') as f:
-                        json.load = json.dump(data, f)
+with open('new-task-def.json', 'w') as f:
+    json.load = json.dump(data, f)
 
-                    print("3.", data)
-                    "
-                                        """
+print("3.", data)
+"
+                    """
 
                     // 3. Register the new Task Definition revision in AWS
                     sh "/usr/local/bin/aws ecs register-task-definition --cli-input-json file://new-task-def.json --region ${AWS_REGION}"
