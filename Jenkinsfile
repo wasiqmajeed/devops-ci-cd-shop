@@ -31,11 +31,11 @@ pipeline {
             steps {
                 sh '/usr/local/bin/docker build -t wasiqmajeed/my-shop:${BUILD_NUMBER} .'
                 echo "${BUILD_NUMBER}"
-                sh "/usr/local/bin/docker stop online-shop || true"
-                sh "/usr/local/bin/docker rm online-shop || true"
-                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
+//                sh "/usr/local/bin/docker stop online-shop || true"
+//                sh "/usr/local/bin/docker rm online-shop || true"
+//                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:${BUILD_NUMBER}'
 //                sh '/usr/local/bin/docker run -d --name online-shop -p 8081:5000 wasiqmajeed/my-shop:latest'
-                sh '/usr/local/bin/docker ps -a'
+//                sh '/usr/local/bin/docker ps -a'
             }
         }
 //        stage('Testing the app') { // Skipping for now as I am not testing this part
@@ -66,8 +66,8 @@ pipeline {
                         sh "echo '$DOCKER_PASS' | /usr/local/bin/docker login -u '$DOCKER_USER' --password-stdin"
                     }
                 echo 'Pushing the image to Docker registry'
-                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
-                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
+//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:${BUILD_NUMBER}'
+//                sh '/usr/local/bin/docker push wasiqmajeed/my-shop:latest'
                 echo 'Pushed the image to Docker registry'
                 }
             }
@@ -78,26 +78,61 @@ pipeline {
                 echo 'Logging into Amazon ECR and pushing...'
                 withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials' ]]) {
                     // Authenticate Docker to AWS ECR
-                    sh "/usr/local/bin/aws ecr get-login-password --region ${AWS_REGION} | /usr/local/bin/docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+//                    sh "/usr/local/bin/aws ecr get-login-password --region ${AWS_REGION} | /usr/local/bin/docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
                     // Tag for ECR and push
-                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
-//                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:28 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
-                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
-                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
-//                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:28"
-                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
+//                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+//                    sh "/usr/local/bin/docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
+//                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+//                    sh "/usr/local/bin/docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest"
                 }
             }
         }
-// Deploy the new image on ECS using ECR
-//        stage('Deply the app using ECS') {
-//            steps {
-//                echo 'Starting the deployment to ECS'
-//
-//            }
-//
-//        }
+
+        stage('Deploy to ECS') {
+            steps {
+                echo 'Starting the deployment to ECS...'
+                withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials' ]]) {
+
+                    // 1. Download the current active task definition
+                    sh "aws ecs describe-task-definition --task-definition ${TASK_FAMILY} --region ${AWS_REGION} --query taskDefinition > task-def.json"
+
+                    // 2. Update the image URI inside the JSON file to point to the new image tag
+                    // (Using a simple Python inline script to modify the JSON cleanly without breaking layout)
+                    sh """
+                    python3 -c "
+                    import json
+                    with open('task-def.json', 'r') as f:
+                        data = json.load(f)
+                        print("1.",data)
+
+                    # Strip out metadata AWS rejects on registration
+                    for key in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes', 'compatibilities', 'registeredAt', 'registeredBy']:
+                        data.pop(key, None)
+
+                    print("Data after poping",data)
+
+                    # Update the image string
+                    data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}'
+
+                    with open('new-task-def.json', 'w') as f:
+                        json.load = json.dump(data, f)
+
+                    print("3.", data)
+                    "
+                                        """
+
+                    // 3. Register the new Task Definition revision in AWS
+                    sh "aws ecs register-task-definition --cli-input-json file://new-task-def.json --region ${AWS_REGION}"
+
+                    // 4. Update the ECS Service to pull down the latest task definition revision
+                    sh "aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --task-definition ${TASK_FAMILY} --force-new-deployment --region ${AWS_REGION}"
+
+                    echo 'Deployment triggered successfully!'
+                }
+            }
+        }
+
 //        stage('Update K8s Manifests') {
 //            steps {
 //                // 1. Clone the manifest repository
