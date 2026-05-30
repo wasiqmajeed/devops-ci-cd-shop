@@ -95,7 +95,7 @@ pipeline {
                 withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials' ]]) {
 
                     // 1. Download the current active task definition
-                    sh "aws ecs describe-task-definition --task-definition ${TASK_FAMILY} --region ${AWS_REGION} --query taskDefinition > task-def.json"
+                    sh "/usr/local/bin/aws ecs describe-task-definition --task-definition ${TASK_FAMILY} --region ${AWS_REGION} --query taskDefinition > task-def.json"
 
                     // 2. Update the image URI inside the JSON file to point to the new image tag
                     // (Using a simple Python inline script to modify the JSON cleanly without breaking layout)
@@ -123,10 +123,10 @@ pipeline {
                                         """
 
                     // 3. Register the new Task Definition revision in AWS
-                    sh "aws ecs register-task-definition --cli-input-json file://new-task-def.json --region ${AWS_REGION}"
+                    sh "/usr/local/bin/aws ecs register-task-definition --cli-input-json file://new-task-def.json --region ${AWS_REGION}"
 
                     // 4. Update the ECS Service to pull down the latest task definition revision
-                    sh "aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --task-definition ${TASK_FAMILY} --force-new-deployment --region ${AWS_REGION}"
+                    sh "/usr/local/bin/aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --task-definition ${TASK_FAMILY} --force-new-deployment --region ${AWS_REGION}"
 
                     echo 'Deployment triggered successfully!'
                 }
