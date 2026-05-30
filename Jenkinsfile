@@ -114,7 +114,7 @@ print("2.", data)
 
 # Update the image string
 # data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}'
-data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest'
+data['containerDefinitions'][0]['image'] = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:47'
 
 with open('new-task-def.json', 'w') as f:
     json.load = json.dump(data, f)
